@@ -76,4 +76,4 @@ Direct payment channels are useful for applications where users need to transact
 However, it is required to lock funds with each peer, and a mechanism for the exchange of messages should be devised. Finally, users need to be online to sign messages. Solutions to some of these issues are available. A user can reach users in other channels by using an intermediary (lightning network, Raiden network, etc.). 
 
 # Practical implementation. 
-The implementation that you find here allows peers to create channels, make transactions using a web platform that connects to the smart contract. The messages are sent using sockets.io, and the signing of messages is done on the client side, which means that there is no need to reveal any critical information about the users. (....under constriction) 
+The implementation that you find here allows peers to create channels, make transactions using a web platform that connects to the smart contract. The messages are sent using sockets.io, and the signing of messages is done on the client side, which means that there is no need to reveal any critical information about the users. **(....under constriction)** 
