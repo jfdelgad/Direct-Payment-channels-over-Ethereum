@@ -2,21 +2,21 @@
 An implementation of direct payment channels.
 
 
-One of the main challenges in ethereum is scalability. First, the speed of the transactions is low due to the need for distributed verification that makes the network secure. Second, the transactions fees makes prohibite applications where a high rate of transactions is needed.
+One of the main challenges in ethereum is scalability. First, the speed of the transactions is low due to the need for distributed verification that makes the network secure. Second, the transactions fees prohibit applications where a high rate of transactions is needed.
 
-Several solution have been proposed for blockchain in general. The lighting network is a successful example of secon layer solutions that are capable to considerably increase the speed of transaction while decreasing the transaction fees to sub-cents levels. 
+Several solutions have been proposed for blockchain in general. The lighting network is a successful example of second layer solutions that are capable to considerably increase the speed of transaction while decreasing the transaction fees to sub-cents levels. 
 
 Introduction to payment Channels:
 
-Assume two users A and B as part of their finanacial activities need to execute many transaction among thenselves. using the main network of ethereum is prohibitive because of speed and high transaction fees. A payment channel allows A and B to exchange cryptographically signed mesages that incidcate the balance for each on of then. When their transactions finish (hours, days, months or years) A and B can submit the final balances to the main network to obtain their corresponding balances (Ether, ERC20, etc).
+Assume two users Peer1 and Peer2 as part of their financial activities need to execute many transactions among themselves. Using the main network of ethereum is prohibitive because of speed and high transaction fees. A payment channel allows Peer1 and Peer2 to exchange cryptographically signed messages that indicate the balance for each one of them. When their transactions finish (hours, days, months or years), Peer1 and Peer2 can submit the final balances to the main network to obtain their corresponding balances (Ether, ERC20, etc).
 
-The challenge is then to guaranty each party that they will receive the correspoding patyment. The procedure is as follows:
+The challenge is then to guaranty each party that they will receive the corresponding payment. The procedure is as follows:
 
-1. A and B deposit and lock funds in a multisignature wallet: this guaranty both peers that the other has the funds to transact.
+1. Peer1 and Peer2 deposit and lock funds in a multi-signature wallet: this guaranty both peers that the other has the funds to transact.
 
-2. A and B exchange signed messages updating teh balances according to thir particular application (A paying every day for coffe in the store owned by B)  
+2. Peer1 and Peer2 exchange signed messages updating the balances according to their particular application (Peer1 paying every day for coffee in the store owned by Peer2 for instance).  
 
-3. At any time A or B can submit the last signed message and be asure to receive what is indicated in the balances.
+3. At any time Peer1 or Peer2 can submit the last signed message and be assured of receiving what is indicated in the balances.
 
 # System description
 
@@ -36,14 +36,14 @@ struct channelStruct{
         
     }
 ```
-`peers` contain the addresses of the members of the channel.
-`nonce` counter that refkect the last transaction reproted to the smart contract.
-`challengePeriod` amount of time that a peer has to respond when the other has requested a withdrawl.
-`challengeExpDate` date at witch the challengePerido will expire.
+`peers` contains the addresses of the members of the channel.
+`nonce` counter that reflects the last transaction reported to the smart contract.
+`challengePeriod` amount of time that a peer has to respond when the other has requested a withdrawal.
+`challengeExpDate` date at which the `challengePeriod` will expire.
 `funds` funds deposited by each peer.
 `balances` last off-chain transaction reported for each peer.
-`joined` flag that inidicates that each party has joined.
-`withdrawStatus` indicate if a peer has requested withdrawal.
+`joined` flag that indicates that each party has joined.
+`withdrawStatus` indicate if a peer has requested a withdrawal.
 
 ## Messages
 
@@ -63,18 +63,17 @@ Signed messages between Peer1 and Peer2 (A and B) are of the form:
 
 ## withdrawal
 
-When the peers decide to withdraw their funds, they submit the las signed message to the smart contract using the function `withdraw`.
-For instance if Peer1 request a withdrawal the smart contract saves the message pased by Peer2 and awaits for the message from Peer2. if the messages are veriied correctly the balances are distributed according to the received message.
+When the peers decide to withdraw their funds, they submit the last signed message to the smart contract using the function `withdraw`.
+For instance, if Peer1 request a withdrawal, the smart contract saves the message passed by Peer2 and waits for the message from Peer2. If the messages are verified correctly, the balances are distributed according to the received message.
 
-However, is possible that one of the peers do not repsonds. If Peer2 submit a request for withdrawal and the message if correctly signed by Peer1 and Peer2 do not submit his version of the message after the `challengePeriod`, the contract will assume that Peers2 submited message is valid (is signed by Peer1) and will redistribute the funds accordingly.
+However, is possible that one of the peers do not responds. If Peer2 submit a request for withdrawal and the message if correctly signed by Peer1 and Peer2 do not submit his version of the message after the `challengePeriod`, the contract will assume that Peers2 submitted message is valid (is signed by Peer1) and will redistribute the funds accordingly.
 
 
 ## Advantage and disadvantages of direct payment channels.
 
-Direct payment channels are usefull for applications where users need to transact continuously, reducing fees to zero and moving the load of the transaction off-chain, while providing al the secuties of the main network of eteherum.
+Direct payment channels are useful for applications where users need to transact continuously, reducing fees to zero and moving the load of the transaction off-chain, while providing al the securities of the main network of Ethereum.
 
-However, is required to lock funds with each peer and a mechanism for the exchange of messahes should be devised. Finally, users need to be online to signe messages. Solutions to some of these issues are available. A user can reach users in other channels by using an intermediary (lightning networ, raiden network, etc). 
+However, it is required to lock funds with each peer, and a mechanism for the exchange of messages should be devised. Finally, users need to be online to sign messages. Solutions to some of these issues are available. A user can reach users in other channels by using an intermediary (lightning network, Raiden network, etc.). 
 
 # Practical implementation. 
-The implementation that you find here, allows peers to ccerate channels, make transaction using  web platform that connects to the smart contract. The messages are sent using sockets.io and the signing of messages is done on the client side, which emans that there is no need to reveal any critical information. (....under constriction) 
-(under)
+The implementation that you find here allows peers to create channels, make transactions using a web platform that connects to the smart contract. The messages are sent using sockets.io, and the signing of messages is done on the client side, which means that there is no need to reveal any critical information about the users. (....under constriction) 
