@@ -57,10 +57,11 @@ contract stateChannels{
     mapping (uint256 => channelStruct) public channels;
     uint256 public channelCounter;
 
-    event channelCreated(address indexed peer1, address indexed peer2, uint256 indexed id);
+    event channelCreated(uint256 indexed id, address indexed peer1, address indexed peer2);
     event Deposit(uint256 indexed id, address indexed peer, uint256 amount);
     event WithdrawRequest(uint256 indexed id, address indexed peer);
     event Withdraw(uint256 indexed id);
+    event Joined(uint256 indexed id, address indexed peer);
 
 
 
@@ -72,7 +73,7 @@ contract stateChannels{
         newChannel.peers[0] = msg.sender;
         newChannel.peers[1] = peer;
         newChannel.joined[msg.sender] = true;
-        emit channelCreated(msg.sender, peer, channelCounter);
+        emit channelCreated(channelCounter,msg.sender, peer);
     }
     
     
@@ -82,6 +83,7 @@ contract stateChannels{
         require(!channel.joined[msg.sender]);
         channel.funds[msg.sender] = msg.value;
         channel.joined[msg.sender] = true;
+        emit Joined(channelId, msg.sender);
     }
 
 
