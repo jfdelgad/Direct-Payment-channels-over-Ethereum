@@ -79,3 +79,5 @@ However, it is required to lock funds with each peer, and a mechanism for the ex
 The implementation that you find here allows peers to create channels, make transactions using a web platform that connects to the smart contract. The messages are sent using sockets.io, and the signing of messages is done on the client side, which means that there is no need to reveal any critical information about the users. 
 
 I cretaed and app that is runnning continuously and allows anyone to create a channel with any other peer. This App runs in Ropsten (Ethereum Test Net). it can be accessed here http://34.73.122.45:3000/
+
+NOTE: THIS RUN IN ROSTEN, **DO NOT** USE THE KEYS OF YOUR ACTUAK ETHEREUM ACCOUNT. CREATING AN ACCOUNT IS EASY AND FREE (I.E, METAMASK)
