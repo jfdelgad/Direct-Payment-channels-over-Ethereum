@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.4">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dyrect Payment Channels</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.0/semantic.min.css">
+
+</head>
+
+
+<body>
+    <div id='home' class="ui divider" invisible></div>
+    <div class="ui fixed black inverted huge menu">
+      <div class="ui container">
+      <a href='#home' class="item active">Home</a>
+      </div>
+    </div>
+
+
+    <div class="ui grid">
+        <div class="three column row">
+        <div class="three wide column"></div>
+        <div class="ten wide column">
+            
+
+            <div  class="ui raised segment">
+                This App implements direct payment channels over ethereum. It allows two peers to send ether to each other instantaneously making use of cryptographically signed messages without fees. Users can withdraw their funds from the channel at any time. You can find the description of the system and associated files in <a href=https://github.com/jfdelgad/Direct-Payment-channels>github</a>
+                <br><br>
+                This app runs on Ropsten (Ethereum test network)
+                <br><br>
+                Developed by:<br>
+                Jaime<br>
+                https://github.com/jfdelgad<br>
+                jfdelgad@gmail.com<br>
+                 
+                
+            </div>
+
+            <div  class="ui raised segment">
+                <a class="ui teal big ribbon label">Login</a>
+                <div style="text-align:center">
+                    <div class="ui action input">
+                        <input id="key" type="password" placeholder="Private Key">
+                        <button class="ui button" onclick="savekey($('[id=key]').val())">Loging</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column"></div>
+        </div>
+
+
+        <div class="three column row">
+        <div class="three wide column"></div>
+        <div class="ten wide column">
+        <div class="ui raised segment">
+            <a class="ui teal big ribbon label">Channels</a>
+            <div>
+            <p></p>
+            <table id=chanTable class="ui very basic small selectable table">
+                <thead>
+                    <tr>
+                    <th>Channel ID</th>
+                    <th>Funds</th>
+                    <th>Peer</th>
+                    <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="ui button" onclick="showCreateChanelform()">New Channel</button>
+            <br><br>
+            </div>
+
+            <div id='createChanelform' style=display:none>
+                
+                <div class="ui top attached tabular menu">
+                    <a class="item active" data-tab="createNewChannel">Create New Channel</a>
+                    <a class="item" data-tab="joinChannel">Join Channel</a>
+                </div>
+                        
+                <div class="ui bottom attached tab segment active" data-tab="createNewChannel">
+                    <div class="ui form">
+                        <div class="field">
+                            <div class="ui labeled input">
+                                <div style=width:20% class="ui label">
+                                    Peer:
+                                </div>
+                                <input name=createchanel_peer type="text" placeholder="Address">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="ui labeled input">
+                                <div style=width:20% class="ui label">
+                                    Amount:
+                                </div>
+                                <input name=createchanel_amount type="number" placeholder="Amount">
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <div class="ui labeled input">
+                                <div style=width:20% class="ui label">
+                                    Challenge Period:
+                                </div>
+                                <input name=createchanel_challengePeriod type="number" placeholder="Days" min="1" step="1">
+                            </div>
+                        </div>
+
+                        <button class="ui button" onclick="createChannel($('[name=createchanel_peer]').val(),$('[name=createchanel_amount]').val(),$('[name=createchanel_challengePeriod]').val())">Create Channel</button>
+                        <button class="ui button" onclick="hideCreateChanelform()">Cancel</button>
+
+                    </div>
+                </div>
+
+                <div class="ui bottom attached tab segment" data-tab="joinChannel">
+                    <div class="ui icon input">
+                        <input oninput="searchChannel($('[name=searchChannel]').val())" name= searchChannel type="number" placeholder="Channel ID">
+                        <i class="circular search link icon"></i>
+                    </div>
+
+                    <table id=joinChannelTable class="ui very basic small table">
+                        <thead>
+                            <tr>
+                            <th>Peer</th>
+                            <th>Peer Balance</th>
+                            <th>Challenge Period</th>
+                            <th>Deposit</th>
+                            </tr>
+                        </thead>
+                    </table> 
+                
+                    
+                    <button class="ui button" onclick="joinChannel($('[name=searchChannel]').val(),$('[name=joinValue]').val())">Join Channel</button>
+                    <button class="ui button" onclick="hideCreateChanelform()">Cancel</button>
+
+                    
+                </div>
+            </div>
+                
+
+        </div>
+        </div>
+        <div class="column"></div>
+        </div>
+
+        <div class="three column row">
+        <div class="three wide column"></div>
+        
+        <div class="ten wide column">          
+            <div class="ui raised segment">
+                <a class="ui teal big ribbon label">Transactions</a><p></p>
+                <div>
+                    <div class="ui top attached tabular menu">
+                        <a class="item active" data-tab="transfer">Transfer</a>
+                        <a class="item" data-tab="deposit">Deposit</a>
+                        <a class="item" data-tab="withdraw">Withdraw</a>
+                    </div>
+                
+
+
+                    <div class="ui bottom attached tab segment active" data-tab="transfer">
+                    <div class="ui form">
+                        <div class="field">
+                            <div class="ui labeled input">
+                                <div style=width:20% class="ui label">
+                                    To:
+                                </div>
+                                <input name=tx_addreess type="text" placeholder="Address">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="ui labeled input">
+                                <div style=width:20% class="ui label">
+                                    Amount:
+                                </div>
+                                <input name=tx_amount type="text" placeholder="Amount to transfer (Ether)">
+                            </div>
+                        </div>
+                        <button class="ui button" onclick="sendTx($('#chanTable .active')[0].cells[0].innerHTML)">Send</button>
+                    </div>
+                    </div>
+                
+
+
+                
+                    <div class="ui bottom attached tab segment" data-tab="deposit">
+                        <div class="ui form"> 
+                            <div class="field">
+                                <div class="ui labeled input">
+                                    <div style=width:20% class="ui label">
+                                        Amount:
+                                    </div>
+                                    <input name='depositAmount' type="number" placeholder="Amount to deposit (Ether)" min=0>
+                                </div>
+                            </div>
+                            <button class="ui button" onclick="deposit(selectedChannel,$('[name=depositAmount]').val())">Send</button>
+                        </div>
+                    </div>
+                
+                
+                    <div class="ui bottom attached tab segment" data-tab="withdraw">
+                        <button class="ui button" onclick="withdraw(selectedChannel)">Withdraw all funds from channel</button>
+                    </div>
+
+                </div>  
+            </div>
+        </div>
+        
+        <div class="column"></div>
+        </div>
+
+        
+
+
+
+        <div class="three column row">
+            <div class="three wide column"></div>
+            <div class="ten wide column">
+                <div class="ui raised segment">
+                    <a class="ui teal big ribbon label">History</a>
+                    <div style="text-align:center">
+                    <table id=TxTable class="ui very basic small table">
+                        <thead>
+                            <tr>
+                            <th>To</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>                    
+                    </div>
+                </div>
+            </div>
+            <div class="column"></div>
+            </div>
+
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.0/semantic.min.js" ></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.8/calendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-calendar/0.0.8/calendar.min.css" />
+
+
+    <script>
+        $('.ui.menu').on('click', '.item', function() {
+            if(!$(this).hasClass('dropdown')) {
+                $(this)
+                .addClass('active')
+                .siblings('.item')
+                .removeClass('active');
+            }
+        });
+    </script>
+
+    <script>
+        function reload() {
+            location.reload();
+        }
+    </script>
+
+
+    <script>
+    
+    var userID;
+    var userData;
+    var channels = {};
+    var account;
+    var socket = io();
+    var selectedChannel = 0;
+    var currentBlock = 0;
+    var numberOfConfirmations = 2;
+    var network = 3;
+    // Set the provider you want from Web3.providers
+    
+    //web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+    web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/BSpGHiGWGYe1EuuCbCK8"));
+
+    
+
+    ABI = [
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "getChannel",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address[2]"
+			},
+			{
+				"name": "",
+				"type": "uint256[2]"
+			},
+			{
+				"name": "",
+				"type": "uint256[2]"
+			},
+			{
+				"name": "",
+				"type": "bool[2]"
+			},
+			{
+				"name": "",
+				"type": "bool[2]"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "channelId",
+				"type": "uint256"
+			}
+		],
+		"name": "joinChannel",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "channelCounter",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "peer",
+				"type": "address"
+			},
+			{
+				"name": "_challengePeriod",
+				"type": "uint256"
+			}
+		],
+		"name": "createChannel",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "peer1Balance",
+				"type": "uint256"
+			},
+			{
+				"name": "peer2Balance",
+				"type": "uint256"
+			},
+			{
+				"name": "nonce",
+				"type": "uint256"
+			},
+			{
+				"name": "signature",
+				"type": "bytes"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "channels",
+		"outputs": [
+			{
+				"name": "nonce",
+				"type": "uint256"
+			},
+			{
+				"name": "challengePeriod",
+				"type": "uint256"
+			},
+			{
+				"name": "challengeExpDate",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "peer1",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "peer2",
+				"type": "address"
+			}
+		],
+		"name": "channelCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "peer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Deposit",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "peer",
+				"type": "address"
+			}
+		],
+		"name": "WithdrawRequest",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "Withdraw",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "peer",
+				"type": "address"
+			}
+		],
+		"name": "Joined",
+		"type": "event"
+	}
+]
+    //var contractInstance = new web3.eth.Contract(ABI,'0x63359Ca968ED8a41062f319FA7342ebB0C9FE081'); //ganache
+    var contractInstance = new web3.eth.Contract(ABI,'0xe77aedaebc10efbddff799407414a4012e6e2eb4'); // ropsten
+
+
+    function initialize(){
+        userData = JSON.parse(localStorage.getItem(userID))
+        if(userData != null){
+            if(userData[account.address]!=null){
+                channels = userData[account.address];
+            }else{
+                channels = {};
+                userData[account.address] = channels;                
+            }
+        } else{
+            channels = {};
+            userData = {};
+            userData[account.address] = channels;
+        }  
+        
+        // check created channels
+        var createChannelTopic = web3.utils.sha3('channelCreated(uint256,address,address)');        
+        var topics = [createChannelTopic, null, toHex(account.address)];
+        
+        web3.eth.getPastLogs({fromBlock:'0', address: contractInstance._address, topics:topics},function(err,logs){
+            var id;
+            for( var i in logs){
+                id = Number(logs[i].topics[1]);
+                getChannel(id);
+            }
+        })
+        
+        var topics = [createChannelTopic, null, null, toHex(account.address)];
+        web3.eth.getPastLogs({fromBlock:'0', address: contractInstance._address, topics:topics},function(err,logs){
+            var id;
+            for( var i in logs){
+                id = Number(logs[i].topics[1]);
+                getChannel(id);
+            }
+        })
+
+    }
+    
+    /*event channelCreated(uint256 indexed id, address indexed peer1, address indexed peer2);
+    event Deposit(uint256 indexed id, address indexed peer, uint256 amount);
+    event WithdrawRequest(uint256 indexed id, address indexed peer);
+    event Withdraw(uint256 indexed id);
+    event Joined(uint256 indexed id, address indexed peer);*/
+    function getUpdates(startBlock,endBlock){
+        web3.eth.getPastLogs({fromBlock:startBlock.toString(), toBlock:endBlock.toString(), address: contractInstance._address},function(err,logs){            
+            if(logs.length==0) return;
+            var id;
+            var ckeys = Object.keys(channels);
+            for( var i in logs){
+                id = Number(logs[i].topics[1]);
+                var createChannelTopic = web3.utils.sha3('channelCreated(uint256,address,address)');
+                var joinedTopic = web3.utils.sha3('Joined(uint256,address)');
+
+                if(channels[id]==null & (logs[i].topics[0]==createChannelTopic | logs[i].topics[0]==joinedTopic) ){
+                    getChannel(id);
+                }else if(channels[id]!=null){
+                    getChannel(id);
+                }                
+            }
+            setTimeout(function(){
+                loadChannels();
+            },1000) 
+        })
+    }
+
+
+    //checked ok
+    function loadChannels(){
+        var table = document.getElementById("chanTable");
+        table.innerHTML = "<thead><tr><th>Channel</th><th>Balance</th><th>Peer</th><th>Status</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td></tr></tbody>";
+        var ckeys = Object.keys(channels);
+        for(var j in ckeys){
+            var i = ckeys[j];
+            var conv = web3.utils.toWei('1','ether');
+            var funds = web3.utils.toBN(channels[i].funds[account.address]);
+            var balance = web3.utils.toBN(channels[i].balances[account.address]);
+            var balancePeer = web3.utils.toBN(channels[i].balances[getPeer(channels[i])]);
+            balance = funds.add(balance).sub(balancePeer).toString()/conv;
+            var row = table.insertRow(1);
+            
+            // status
+            var text;
+            if((channels[i].withdrawalStatus[getPeer(channels[i])] || channels[i].withdrawalStatus[account.address])) {
+                text = 'Withdrawal requested';
+            }else if(!channels[i].joined[getPeer(channels[i])]){
+                text = 'Awaiting for Peer...';
+            }else {
+                text = 'Active';
+            }
+
+            // slected row?
+            var selectedStatus = '' ;
+            if(selectedChannel==i){
+                selectedStatus = 'Active';
+            }
+            row.outerHTML = '<tr onclick="selectChannel(this)" id=chID'+ i + ' ' + selectedStatus +' ><td>'+ i +'</td>' + '<td>' + 
+                            balance + ' ETH' + '</td>' + 
+                            '<td>' + getPeer(channels[i]) + '</td>'+'<td>' + text + '</td></tr>';
+        
+        }
+    }
+
+    //checked ok
+    function createChannel(chPeer,funds,challengePeriod){
+        challengePeriod = Math.round(challengePeriod);
+        if(challengePeriod<1){
+            alarm('Challenge period (days) should be an integer bigger than zero.')
+            return
+        }
+        var bytecode = contractInstance.methods.createChannel(chPeer,challengePeriod).encodeABI() 
+        web3.eth.getTransactionCount(account.address,function(err,nonceVal){
+            var tx = {
+                to: contractInstance._address,
+                value: web3.utils.toWei(funds.toString(),'ether'),
+                gas: 2000000,
+                gasPrice: 2000000000,
+                nonce: nonceVal,
+                chainId: network,
+                data: bytecode
+                }
+                var table = document.getElementById("chanTable");
+                var row = table.insertRow(1)
+                row.outerHTML = '<tr onclick="selectRow(this)" id=chID'+ chPeer +' ><td>-</td>' + '<td>' + funds + ' ETH' + '</td>' + '<td>' + chPeer + '</td>'+'<td>Creating... <div class="ui small active inline loader"></div></td></tr>';
+                hideCreateChanelform();
+
+            web3.eth.accounts.signTransaction(tx, account.privateKey, function(err,signedTx){
+                web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+                    .on('confirmation', function(confirmationNumber,receipt){                          
+                    })
+            })
+        })
+        
+    }
+
+    //checked Ok
+    function joinChannel(id,funds){
+        id = Number(id);
+        funds = Number(funds);
+
+        if(funds<0){
+            alert("Amount to deposit can't be less than zero");
+            return;
+        }
+        
+
+        
+        var bytecode = contractInstance.methods.joinChannel(id).encodeABI(); 
+        web3.eth.getTransactionCount(account.address,function(err,nonceVal){
+            contractInstance.methods.getChannel(id).call({blockNumber:'latest'},function(err,info){
+                var ch = {};
+                ch.peers = info[0];
+                
+                var tx = {
+                    to: contractInstance._address,
+                    value: web3.utils.toWei(funds.toString(),'ether'),
+                    gas: 2000000,
+                    gasPrice: 2000000000,
+                    nonce: nonceVal,
+                    chainId: network,
+                    data: bytecode
+                    }
+                    
+                if($('[id=chID'+ id +']').length == 0){
+                    var table = document.getElementById("chanTable");
+                    var row = table.insertRow(1);
+                    row.outerHTML = '<tr onclick="selectRow(this)" id=chID'+ id +'><td>' + id + '</td>' + '<td> + ' + funds + ' ETH' + '</td>' + '<td>' + getPeer(ch) + '</td>' + '<td> Joinig... <div class="ui small active inline loader"></div></td></tr>';
+                } else{
+                    $('[id=chID'+ id +']')[0].cells[1].innerHTML = $('[id=chID'+ id +']')[0].cells[1].innerHTML + '(+'+funds+')';
+                    $('[id=chID'+ id +']')[0].cells[3].innerHTML = 'Updating';
+                }
+                //hideCreateChanelform();
+
+                web3.eth.accounts.signTransaction(tx, account.privateKey, function(err,signedTx){
+                web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+                    .on('confirmation', function(confirmation,conreceipt){
+                        hideCreateChanelform();                    
+                    })
+                })
+            })
+        })
+    }
+
+    //checked ok
+    function getChannel(id){
+        var ch = {}
+        id = Number(id);
+        contractInstance.methods.getChannel(id).call({blockNumber:currentBlock},function(err,info){
+            
+            //Peers
+            ch.peers = info[0];
+            if(ch.peers[0]!=account.address & ch.peers[1]!=account.address){
+                return
+            }
+            
+            // Peers funds
+            ch.funds = {};
+            ch.funds[ch.peers[0]] = web3.utils.toBN(info[1][0]).toString();
+            ch.funds[ch.peers[1]] = web3.utils.toBN(info[1][1]).toString();
+
+
+            //Peers Balances
+            ch.balances = {};
+            ch.balances[ch.peers[0]] = web3.utils.toBN(info[2][0]).toString();
+            ch.balances[ch.peers[1]] = web3.utils.toBN(info[2][1]).toString();
+
+            //Peers withdrawalStatus
+            ch.withdrawalStatus = {};
+            ch.withdrawalStatus[ch.peers[0]] = info[3][0];
+            ch.withdrawalStatus[ch.peers[1]] = info[3][1];
+
+            //Peers joined
+            ch.joined = {};
+            ch.joined[ch.peers[0]] = info[4][0];
+            ch.joined[ch.peers[1]] = info[4][1];
+            if(ch.joined[account.address]==false){
+                return;
+            }
+
+            //Nonce
+            ch.nonce = web3.utils.toBN(info[5]).toString();
+            
+            //Challenge Period
+            ch.challengePeriod = web3.utils.toBN(info[6]).toString();
+
+            // challengeExpDate
+            ch.challengeExpDate = web3.utils.toBN(info[7]).toString();
+
+            ch.confirmed = [];
+            ch.sent = '';
+
+
+
+            // if the channel exist do not update the state
+            if(channels[id]==null){
+                channels[id] = ch;
+            }else if(ch.nonce > channels[id].nonce & 
+                     !(ch.withdrawalStatus[ch.peers[0]] || ch.withdrawalStatus[ch.peers[1]]) ){
+                channels[id] = ch;
+                var table = document.getElementById("TxTable");
+                table.innerHTML = '<thead><tr><th>To</th><th>Amount</th><th>Date</th></tr></thead><tbody></tbody>'                        
+            }else{
+                ch.balances[ch.peers[0]] = channels[id].balances[ch.peers[0]];
+                ch.balances[ch.peers[1]] = channels[id].balances[ch.peers[1]];
+                ch.nonce = channels[id].nonce;
+                ch.confirmed = channels[id].confirmed;
+                ch.sent = channels[id].sent;
+                channels[id] = ch;
+            }
+
+            userData[account.address] = channels; 
+            localStorage.setItem(userID,JSON.stringify(userData));
+        })
+    }
+
+    //checked OK
+    function searchChannel(id) {
+        
+        var ch = {}
+        id = Number(id);
+        if(id<1) return;
+
+        contractInstance.methods.getChannel(id).call({blockNumber:'latest'},function(err,info){
+            
+            //Peers
+            ch.peers = info[0];
+            if(ch.peers[0]!=account.address & ch.peers[1]!=account.address){
+                var table = document.getElementById("joinChannelTable");
+                if(table.rows.length==2){
+                    var row = table.rows[1];
+                    row.outerHTML = '<tr><td></td><td></td><td></td><td></td><td></td></tr>';
+                }
+                return
+            }
+            
+            // Peers funds
+            ch.funds = {};
+            ch.funds[ch.peers[0]] = web3.utils.toBN(info[1][0]).toString();
+            ch.funds[ch.peers[1]] = web3.utils.toBN(info[1][1]).toString();
+          
+            //Challenge Period
+            ch.challengePeriod = web3.utils.toBN(info[6]).toString();
+          
+
+
+            if(channels[id]!=null){
+                var table = document.getElementById("joinChannelTable");
+                var row = table.rows[1];
+                row.outerHTML = '<tr><td></td><td></td><td></td><td></td><td></td></tr>';
+                return
+            }else{
+                var table = document.getElementById("joinChannelTable");                
+                var ref = web3.utils.toBN(Math.pow(10,18));
+                if(table.rows.length==2){
+                    var row = table.rows[1];
+                    row.outerHTML = '<tr><td>' + getPeer(ch) + '</td>' + '<td>' + web3.utils.toBN(ch.funds[getPeer(ch)]).div(ref).toString() + '</td>' + '<td>' + ch.challengePeriod + '</td>' + 
+                                    '<td><div class="ui input"><input name=joinValue type="number" placeholder="Amount" value=0></div></td></tr>';
+                }else{
+                    var row = table.insertRow(1);
+                    row.outerHTML = '<tr><td>' + getPeer(ch) + '</td>' + '<td>' + web3.utils.toBN(ch.funds[getPeer(ch)]).div(ref).toString() + '</td>' + '<td>' + ch.challengePeriod + '</td>' + 
+                                    '<td><div class="ui input"><input name=joinValue type="number" placeholder="Amount" value=0></div></td></tr>';
+                }
+            }
+        })
+    }
+
+
+    setInterval(function(){
+        if(account!=null){
+            web3.eth.getBlockNumber(function(err,blockNumber){
+                if(blockNumber-numberOfConfirmations>currentBlock){                    
+                    getUpdates(currentBlock,blockNumber-numberOfConfirmations);
+                    setTimeout(function(){
+                        currentBlock = blockNumber-numberOfConfirmations;
+                    },1000);
+                }
+            });
+        }
+    },3000)
+
+    //checked ok
+    function savekey(key){
+        if(key.length==66){           
+            account = web3.eth.accounts.privateKeyToAccount(key);
+            userID = account.address;
+            register();
+            initialize();
+            loadChannels();
+        }else{
+            alert('The provided key is invalid.')
+        }
+    }
+
+    //checked ok
+    function deposit(id,value){
+        if(value<0){
+            alert("Amount to deposit can't be less than zero");
+            return
+        }
+
+        if(selectedChannel==0){
+            alert('Please, select the channel to which you want to make a deposit.')
+            return
+        }
+
+
+        id = Number(id);
+        var bytecode = contractInstance.methods.deposit(id).encodeABI(); 
+        web3.eth.getTransactionCount(account.address,function(err,nonceVal){
+            var tx = {
+                to: contractInstance._address,
+                value: web3.utils.toWei(value.toString(),'ether'),
+                gas: 2000000,
+                gasPrice: 2000000000,
+                nonce: nonceVal,
+                chainId: network,
+                data: bytecode
+                }
+                
+                $('[id=chID'+ id +']')[0].cells[1].innerHTML = $('[id=chID'+ id +']')[0].cells[1].innerHTML + '(+'+value+')';
+                $('[id=chID'+ id +']')[0].cells[3].innerHTML = 'Depositing... <div class="ui small active inline loader"></div>';
+                web3.eth.accounts.signTransaction(tx, account.privateKey, function(err,signedTx){
+                web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+                    .on('confirmation', function(confirmation,conreceipt){
+                    })
+            })
+        })
+    }
+    
+    // checked ok
+    function withdraw(id) {
+        id = Number(id);
+        getChannel(id);
+        var last = channels[id].confirmed.length-1;
+        var balancePeer1 = channels[id].confirmed[last].balances[channels[id].peers[0]];
+        var balancePeer2 = channels[id].confirmed[last].balances[channels[id].peers[1]];
+        var nonce = channels[id].confirmed[last].nonce;
+        var v = channels[id].confirmed[last].signatures[getPeer(channels[id])].v;
+        var s = channels[id].confirmed[last].signatures[getPeer(channels[id])].s;
+        var r = channels[id].confirmed[last].signatures[getPeer(channels[id])].r;
+        var signature = r + s.slice(2) + v.slice(2);
+
+        var cell3 = $('[id=chID'+ id +']')[0].cells[3];
+        cell3.innerHTML = 'Requesting withdrawal';
+        
+        var bytecode = contractInstance.methods.withdraw(id.toString(),balancePeer1,balancePeer2,nonce,signature).encodeABI() 
+        web3.eth.getTransactionCount(account.address,function(err,nonceVal){
+            var tx = {
+                to: contractInstance._address,
+                value: 0,
+                gas: 2000000,
+                gasPrice: 2000000000,
+                nonce: nonceVal,
+                chainId: network,
+                data: bytecode
+                }
+            web3.eth.accounts.signTransaction(tx, account.privateKey, function(err,signedTx){
+                web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+                    .on('confirmation', function(confirmation,conreceipt){
+                    })
+            })
+        })
+    } 
+
+
+    function sendTx_bridge(id){
+        
+        // gather all the necessary variables
+        
+        var id = Number(id);
+        var to = $('[name=tx_addreess]').val();
+        var fee = web3.utils.toBN(web3.utils.toWei('0.001',ether));
+        amount = web3.utils.toBN(web3.utils.toWei($('[name=tx_amount]').val(),'ether'));
+        getChannel(id); // uodate the channels in case that activity form the peers has update the funds
+        setTimeout(function(){
+        },500)
+        var value = amount.add(fee);        
+        var ch = JSON.parse(JSON.stringify(channels[id]));
+        var funds = web3.utils.toBN(ch.funds[account.address]);
+        var balance = web3.utils.toBN(ch.balances[account.address]);
+        var peerBalance = web3.utils.toBN(ch.balances[getPeer(channels[id])]);
+        
+        // check is the valance is sufficient
+        if (funds.sub(peerBalance).add(balance).lt(value)){
+            alert('Insuficient funds.');
+
+            return;
+        }
+        
+        // update balance (this is going to the sent variable, do not update the actual channel)
+        ch.balances[getPeer(channels[id])] = peerBalance.add(value).toString();
+        ch.nonce = web3.utils.toBN(ch.nonce).add(web3.utils.toBN('1')).toString();
+
+        // create message to be signed
+        msg =   toHex(id) +
+                toHex(ch.balances[ch.peers[0]]).slice(2) +
+                toHex(ch.balances[ch.peers[1]]).slice(2) +
+                toHex(ch.nonce).slice(2) +
+                toHex(to).slice(2) + 
+                toHex(amount).slice(2);
+        
+        signedmsg = web3.eth.accounts.sign(web3.utils.sha3(msg),account.privateKey);
+
+        var proof = {};
+        proof.id = id;
+        proof.balances = ch.balances;
+        proof.nonce = ch.nonce;
+        proof.data = {};
+        proof.data.to = to;
+        proof.data.amount = amount.toString();
+        proof.signatures = {};
+        proof.signatures[account.address] = {};
+        proof.signatures[account.address].v = signedmsg.v;
+        proof.signatures[account.address].r = signedmsg.r;
+        proof.signatures[account.address].s = signedmsg.s;
+        proof.type = "3";
+
+        // update last sent transaction
+        channels[id].sent = proof;
+        
+        // create new socketio message
+        var newTx = {}
+        newTx.tx = proof;
+        newTx.to = getPeer(channels[id]);
+        
+        // emit message
+        socket.emit('new_msg', JSON.stringify(newTx));
+        
+        // save local data in the browser (must be changed in the future)
+        userData[account.address] = channels; 
+        localStorage.setItem(userID,JSON.stringify(userData));   
+     }
+
+     function receiveTx_bridge(msg){
+        
+        var proof = JSON.parse(msg);
+        var id = Number(proof.id);
+        var ch = JSON.parse(JSON.stringify(channels[id]));
+
+        // verify signature
+        var msg = web3.utils.sha3(toHex(proof.id) + 
+                                  toHex(proof.balances[ch.peers[0]]).slice(2) + 
+                                  toHex(proof.balances[ch.peers[1]]).slice(2) + 
+                                  toHex(proof.nonce).slice(2)) +
+                                  tohex(proof.to).slice(2) + 
+                                  toHex(amount).slice(2);
+
+
+        
+        var newBalance = {};
+        newBalance[ch.peers[0]] = web3.utils.toBN(proof.balances[ch.peers[0]]);
+        newBalance[ch.peers[1]] = web3.utils.toBN(proof.balances[ch.peers[1]]);
+        var newNonce = web3.utils.toBN(proof.nonce);
+        
+        var funds = {};
+        funds[ch.peers[0]] = web3.utils.toBN(ch.funds[ch.peers[0]]);
+        funds[ch.peers[1]] = web3.utils.toBN(ch.funds[ch.peers[1]]);
+        
+        var oldBalance = {};
+        oldBalance[ch.peers[0]] = web3.utils.toBN(ch.balances[ch.peers[0]]);
+        oldBalance[ch.peers[1]] = web3.utils.toBN(ch.balances[ch.peers[1]]);
+
+        var oldNonce = web3.utils.toBN(ch.nonce);
+
+        var signature = proof.signatures[getPeer(channels[id])];
+        var signer = web3.eth.accounts.recover(msg,signature.v,signature.r,signature.s);
+        
+        if(signer==getPeer(channels[id]) &                                                                                        // correct signature
+            newBalance[account.address].gt(oldBalance[account.address]) &                                                         // positive value received
+            newBalance[getPeer(channels[id])].eq(oldBalance[getPeer(channels[id])]) &                                             // sender receibed value should not change
+            funds[getPeer(channels[id])].add(newBalance[getPeer(channels[id])]).sub(newBalance[account.address]).gte(web3.utils.toBN(0)) &  // sender has enough funds
+            newNonce.gt(oldNonce)){                                                                                               // nonce is bigger than the previous received                    
+        
+            // sign the received message
+            signedmsg = web3.eth.accounts.sign(msg,account.privateKey);
+            proof.signatures[account.address] = {};
+            proof.signatures[account.address].v = signedmsg.v;
+            proof.signatures[account.address].r = signedmsg.r;
+            proof.signatures[account.address].s = signedmsg.s;
+            proof.date = getformatedDate();
+
+            // update the channel information
+            ch.balances = proof.balances;
+            ch.nonce = proof.nonce;
+            ch.confirmed.push(proof);
+            channels[id] = ch;
+
+            // send the signed message back as confirmation
+            var newTx = {}
+            proof.type = '4';
+            newTx.tx = proof;
+            newTx.to = getPeer(channels[id]);
+            socket.emit('new_msg', JSON.stringify(newTx));
+            
+            // update local storage
+            userData[account.address] = channels; 
+            localStorage.setItem(userID,JSON.stringify(userData));
+
+            updateBalance(id);
+            listTransactions(channels[id].confirmed.length-1);
+            
+        }else{
+            console.log('Incorrect transaction')
+        }
+            
+    }
+
+
+    //ok
+    function sendTx(id){
+        
+        // gather all the necessary variables
+        var id = Number(id);
+        getChannel(id); // uodate the channels in case that activity form the peers has update the funds
+        setTimeout(function(){
+        },500)
+        var value = web3.utils.toBN(web3.utils.toWei($('[name=tx_amount]').val(),'ether'));        
+        var ch = JSON.parse(JSON.stringify(channels[id]));
+        var funds = web3.utils.toBN(ch.funds[account.address]);
+        var balance = web3.utils.toBN(ch.balances[account.address]);
+        var peerBalance = web3.utils.toBN(ch.balances[getPeer(channels[id])]);
+        
+        // check is the valance is sufficient
+        if (funds.sub(peerBalance).add(balance).lt(value)){
+            console.log('Insuficient funds');
+            return;
+        }
+        
+        // update balance (this is going to the sent variable, do not update the actual channel)
+        ch.balances[getPeer(channels[id])] = peerBalance.add(value).toString();
+        ch.nonce = web3.utils.toBN(ch.nonce).add(web3.utils.toBN('1')).toString();
+
+        // create message to be signed
+        msg =   toHex(id) +
+                toHex(ch.balances[ch.peers[0]]).slice(2) +
+                toHex(ch.balances[ch.peers[1]]).slice(2) +
+                toHex(ch.nonce).slice(2);
+        signedmsg = web3.eth.accounts.sign(web3.utils.sha3(msg),account.privateKey);
+
+        var proof = {};
+        proof.id = id;
+        proof.balances = ch.balances;
+        proof.nonce= ch.nonce;
+        proof.signatures = {};
+        proof.signatures[account.address] = {};
+        proof.signatures[account.address].v = signedmsg.v;
+        proof.signatures[account.address].r = signedmsg.r;
+        proof.signatures[account.address].s = signedmsg.s;
+        proof.type = "1";
+
+        // update last sent transaction
+        channels[id].sent = proof;
+        
+        // create new socketio message
+        var newTx = {}
+        newTx.tx = proof;
+        newTx.to = getPeer(channels[id]);
+        
+        // emit message
+        socket.emit('new_msg', JSON.stringify(newTx));
+        
+        // save local data in the browser (must be changed in the future)
+        userData[account.address] = channels; 
+        localStorage.setItem(userID,JSON.stringify(userData));   
+     }
+
+    //ok
+    function receiveTx(msg){
+        
+        var proof = JSON.parse(msg);
+        var id = Number(proof.id);
+        var ch = JSON.parse(JSON.stringify(channels[id]));
+
+        // verify signature
+        var msg = web3.utils.sha3(toHex(proof.id) + 
+                                  toHex(proof.balances[ch.peers[0]]).slice(2) + 
+                                  toHex(proof.balances[ch.peers[1]]).slice(2) + 
+                                  toHex(proof.nonce).slice(2));
+
+
+        
+        var newBalance = {};
+        newBalance[ch.peers[0]] = web3.utils.toBN(proof.balances[ch.peers[0]]);
+        newBalance[ch.peers[1]] = web3.utils.toBN(proof.balances[ch.peers[1]]);
+        var newNonce = web3.utils.toBN(proof.nonce);
+        
+        var funds = {};
+        funds[ch.peers[0]] = web3.utils.toBN(ch.funds[ch.peers[0]]);
+        funds[ch.peers[1]] = web3.utils.toBN(ch.funds[ch.peers[1]]);
+        
+        var oldBalance = {};
+        oldBalance[ch.peers[0]] = web3.utils.toBN(ch.balances[ch.peers[0]]);
+        oldBalance[ch.peers[1]] = web3.utils.toBN(ch.balances[ch.peers[1]]);
+
+        var oldNonce = web3.utils.toBN(ch.nonce);
+
+        var signature = proof.signatures[getPeer(channels[id])];
+        var signer = web3.eth.accounts.recover(msg,signature.v,signature.r,signature.s);
+        
+        if(signer==getPeer(channels[id]) &                                                                                        // correct signature
+            newBalance[account.address].gt(oldBalance[account.address]) &                                                         // positive value received
+            newBalance[getPeer(channels[id])].eq(oldBalance[getPeer(channels[id])]) &                                             // sender receibed value should not change
+            funds[getPeer(channels[id])].add(newBalance[getPeer(channels[id])]).sub(newBalance[account.address]).gte(web3.utils.toBN(0)) &  // sender has enough funds
+            newNonce.gt(oldNonce)){                                                                                               // nonce is bigger than the previous received                    
+        
+            // sign the received message
+            signedmsg = web3.eth.accounts.sign(msg,account.privateKey);
+            proof.signatures[account.address] = {};
+            proof.signatures[account.address].v = signedmsg.v;
+            proof.signatures[account.address].r = signedmsg.r;
+            proof.signatures[account.address].s = signedmsg.s;
+            proof.date = getformatedDate();
+
+            // update the channel information
+            ch.balances = proof.balances;
+            ch.nonce = proof.nonce;
+            ch.confirmed.push(proof);
+            channels[id] = ch;
+
+            // send the signed message back as confirmation
+            var newTx = {}
+            proof.type = '2';
+            newTx.tx = proof;
+            newTx.to = getPeer(channels[id]);
+            socket.emit('new_msg', JSON.stringify(newTx));
+            
+            // update local storage
+            userData[account.address] = channels; 
+            localStorage.setItem(userID,JSON.stringify(userData));
+
+            updateBalance(id);
+            listTransactions(channels[id].confirmed.length-1);
+            
+        }else{
+            console.log('Incorrect transaction')
+        }
+            
+    }
+
+    //ok
+    function receiveTx_confirmation(msg){
+        var proof = JSON.parse(msg);
+        var id = Number(proof.id);
+        var ch = JSON.parse(JSON.stringify(channels[id]));
+
+        var msg = web3.utils.sha3(toHex(proof.id) + 
+                                  toHex(proof.balances[ch.peers[0]]).slice(2) + 
+                                  toHex(proof.balances[ch.peers[1]]).slice(2) + 
+                                  toHex(proof.nonce).slice(2));
+        
+        var oldproof = ch.sent;
+        var oldmsg = web3.utils.sha3(toHex(oldproof.id) + 
+                                     toHex(oldproof.balances[ch.peers[0]]).slice(2) + 
+                                     toHex(oldproof.balances[ch.peers[1]]).slice(2) + 
+                                     toHex(oldproof.nonce).slice(2));
+        
+        
+        var signature = proof.signatures[getPeer(channels[id])];
+        var peer = web3.eth.accounts.recover(msg,signature.v,signature.r,signature.s);
+        
+        var signature = proof.signatures[account.address];
+        var user = web3.eth.accounts.recover(msg,signature.v,signature.r,signature.s);        
+
+
+        if(peer == getPeer(channels[id]) &                                         // peer signature is valid
+            user ==account.address &                                               // user signature is valid                
+            msg == oldmsg){                                                        // messages are the same
+
+                // update channel
+                channels[id].balances = proof.balances;
+                channels[id].nonce = proof.nonce;                                
+                proof.date = getformatedDate();
+                channels[id].confirmed.push(proof);
+                
+                // update local storage
+                userData[account.address] = channels; 
+                localStorage.setItem(userID,JSON.stringify(userData));
+                
+                updateBalance(id);
+                listTransactions(channels[id].confirmed.length-1);
+
+        } else {
+            console.log('Received incorrect confrimation')
+        }
+    }
+
+
+
+    function toHex(data){
+        var tmp = web3.utils.toHex(data);
+        tmp = '0x' + '0'.repeat(64-(tmp.length-2)) + tmp.substring(2);
+        return tmp;
+    }
+
+    function findPeer(peerAddress){
+        keys = Object.keys(channels);
+        for(var i = 0;i<keys(channels).length;i++){
+            if(channels[keys[i]].peers[0]==peerAddress || channels[keys[i]].peers[1] == peerAddress){
+                return keys[i];
+            }else{
+                return "0";
+            }
+        }
+    } 
+    
+    function register(){
+        socket.emit('register',account.address)
+    }
+
+    function showCreateChanelform(){
+        $('[id=createChanelform]').css('display','block')
+    }
+    
+    function hideCreateChanelform(){
+        $('[id=createChanelform]').css('display','none')
+        $('[name=createchanel_peer]').val("");
+        $('[name=createchanel_amount]').val("");
+        $('[name=createchanel_challengePeriod]').val("");
+        $('[name=createchanel_duration]').val("");
+
+        $('[name=searchChannel]').val("");
+        var table = document.getElementById("joinChannelTable");
+        var row = table.rows[1];
+        table.outerHTML = '<table id=joinChannelTable class="ui very basic small table"><thead><tr><th>Peer</th><th>Peer Balance</th><th>Challenge Period</th><th>Deposit</th></tr></thead></table>' 
+    }
+
+    function updateBalance(id){
+        var funds = web3.utils.toBN(channels[id].funds[account.address]);
+        var received = web3.utils.toBN(channels[id].balances[account.address]);
+        var sent = web3.utils.toBN(channels[id].balances[getPeer(channels[id])]);
+        var balance = funds.add(received).sub(sent).toString();
+        var factor = web3.utils.toWei('1','ether');
+        balance = (balance/factor).toString();
+        
+        var row = document.getElementById("chID"+id);
+        row.cells[1].innerHTML = balance + ' ETH';
+
+    }
+
+    $(function () {
+		socket.on('new_msg', function(msg){  
+            var proof = JSON.parse(msg);
+            /* 
+            type 1: simple transaction between two peers in a channel
+            type 2: simple transaction confirmation
+            */
+            if(proof.type=='1') receiveTx(msg);
+            if(proof.type=='2') receiveTx_confirmation(msg);
+            
+        });
+        
+        
+        socket.on('error1', function(msg){
+      		console.log(msg);
+    	});
+  	});
+    
+    $(function() {$('.menu .item').tab();});
+
+    function selectChannel(row){
+        $(row).addClass('active').siblings().removeClass('active');
+        selectedChannel = row.cells[0].innerHTML;
+        $('[name=tx_addreess]').val(getPeer(channels[selectedChannel]))
+        updateBalance(selectedChannel);
+        listTransactions(0);
+    }
+
+    function getformatedDate(){
+        var d = new Date();
+        var day = d.getDate().toString();
+        if(day.length==1) day = '0' + day;
+
+        var month = (d.getMonth()+1).toString();
+        if(month.length==1) month = '0' + month;
+
+        var year = d.getFullYear();
+
+        return day + '/' + month + '/' + year;
+
+    }
+
+    function getPeer(channel){
+        var peers = channel.peers;
+        if(peers[0]==account.address){
+            return peers[1]
+        }else if(peers[1]==account.address){
+            return peers[0]
+        }
+    }
+
+    function listTransactions(j){
+        
+        if(selectedChannel==0 || channels[selectedChannel].confirmed.length==0){
+            return
+        }
+
+        if(j==0){
+            var prevBalance1 = web3.utils.toBN(0);
+            var prevBalance2 = web3.utils.toBN(0);
+        } else{
+            var prevBalance1 = web3.utils.toBN(channels[selectedChannel].confirmed[j-1].balances[channels[selectedChannel].peers[0]]);
+            var prevBalance2 = web3.utils.toBN(channels[selectedChannel].confirmed[j-1].balances[channels[selectedChannel].peers[1]]);
+        }
+        var table = document.getElementById("TxTable");
+        if(j==0){
+            table.innerHTML = '<thead><tr><th>To</th><th>Amount</th><th>Date</th></tr></thead><tbody></tbody>'
+        }
+        
+        for(var i=j;i<channels[selectedChannel].confirmed.length;i++){
+            var newBalance1 = web3.utils.toBN(channels[selectedChannel].confirmed[i].balances[channels[selectedChannel].peers[0]]);
+            var newBalance2 = web3.utils.toBN(channels[selectedChannel].confirmed[i].balances[channels[selectedChannel].peers[1]]);
+            var diff1 = newBalance1.sub(prevBalance1);
+            var diff2 = newBalance2.sub(prevBalance2);
+
+            var to = channels[selectedChannel].peers[Number(diff1.gt(diff2))];
+            if(diff1.gt(diff2)){
+                var amount = diff1.toString()/web3.utils.toWei('1','ether');
+            } else{
+                var amount = diff2.toString()/web3.utils.toWei('1','ether');;
+            }
+            var txdate =  channels[selectedChannel].confirmed[i].date;
+            
+            var row = table.insertRow(1);
+            row.insertCell(0).innerHTML = to;
+            row.insertCell(1).innerHTML = amount;
+            row.insertCell(2).innerHTML = txdate;
+
+            prevBalance1 = newBalance1;
+            prevBalance2 = newBalance2;
+        }
+
+
+
+
+        //channels[selectedChannel].
+    }
+
+    </script>
+
+
+
+
+
+
+</body>
+</html>
