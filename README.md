@@ -80,4 +80,4 @@ The implementation that you find here allows peers to create channels, make tran
 
 I cretaed and app that is runnning continuously and allows anyone to create a channel with any other peer. This App runs in Ropsten (Ethereum Test Net). it can be accessed here http://34.73.122.45:3000/
 
-NOTE: THIS RUN IN ROSTEN, **DO NOT** USE THE KEYS OF YOUR ACTUAK ETHEREUM ACCOUNT. CREATING AN ACCOUNT IS EASY AND FREE (I.E, METAMASK)
+NOTE: THIS RUN IN ROPSTEN TEST NET, **DO NOT USE** THE KEYS OF YOUR ACTUAL ETHEREUM MAINNET ACCOUNT. CREATING AN ACCOUNT IS EASY AND FREE (I.E, METAMASK)
