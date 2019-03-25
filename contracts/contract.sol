@@ -1,4 +1,3 @@
-//pragma experimental ABIEncoderV2; 
 pragma solidity ^0.5.1;
 
 // ----------------------------------------------------------------------------
@@ -136,6 +135,10 @@ contract stateChannels{
     }
         
     
+    
+    
+    
+    
     function getChannel(uint256 id) public view returns(address[2] memory ,uint256[2] memory ,uint256[2] memory ,bool[2] memory,
                                                         bool[2] memory, uint256,uint256,uint256) {
         channelStruct storage channel = channels[id];
@@ -183,7 +186,9 @@ contract stateChannels{
     
     function withdraw(uint256 id) public {
         channelStruct storage channel = channels[id];
+        require(channel.challengeExpDate>0);
         require(block.timestamp > channel.challengeExpDate);
+        
         address(uint160(channel.peers[0])).transfer(channel.funds[channel.peers[0]].add(channel.balances[channel.peers[0]]).sub(channel.balances[channel.peers[1]]));
         address(uint160(channel.peers[0])).transfer(channel.funds[channel.peers[1]].add(channel.balances[channel.peers[1]]).sub(channel.balances[channel.peers[0]]));
 
